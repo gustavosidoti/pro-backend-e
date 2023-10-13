@@ -1,0 +1,26 @@
+export default {
+    product_list: (product, variedades = []) => {
+        return {
+            _id: product._id,
+            title: product.title,
+            sku: product.sku,
+            slug: product.slug,
+            imagen: 'http://localhost:3000'+'/api/products/uploads/products/'+product.portada,//*
+            categorie: product.categorie,
+            priceEuro: product.priceEuro,
+            priceUSD: product.priceUSD,
+            stock: product.stock,
+            description: product.description,
+            resumen: product.resumen,
+            tags: product.tags ? JSON.parse(product.tags) : [],
+            type_inventario: product.type_inventario,
+            state: product.state,
+            variedades: variedades,
+            galerias:product.galerias.map((galeria) => {
+                galeria.imagen = 'http://localhost:3000'+'/api/products/uploads/products/'+galeria.imagen;//*
+                return galeria;
+            }),
+        
+        }
+    }
+}

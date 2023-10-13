@@ -4,7 +4,7 @@ import auth from "../middlewares/auth"
 
 const router = routerx();
 
-//http://localhost:3000/api/user
+//http://localhost:3000/api/users
 
 router.post("/register", usercontroller.register);
 router.post("/register_admin", auth.verifyAdmin, usercontroller.registerAdmin);
