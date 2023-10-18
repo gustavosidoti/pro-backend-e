@@ -94,4 +94,22 @@ export default {
             })
         }
     },
+    config: async(req,res)=> {
+        try {
+
+           let Products = await models.Product.find({state:2});
+           let Categories = await models.Categorie.find({state:1});
+
+            res.status(200).json({
+                message: 200,
+                products: Products,
+                categories: Categories
+            });
+            
+        } catch (error) {
+            res.status(500).send({
+                message: "OCURRIO UN ERROR",
+            })
+        }
+    },
 }
