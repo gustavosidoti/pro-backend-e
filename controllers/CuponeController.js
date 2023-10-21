@@ -46,7 +46,7 @@ export default {
             let cuponeT = await models.Cupone.findById({_id: data._id});
             res.status(200).json({
                 message: 200,
-                message_text: "EL CUPON SE REGISTRO CORRECTAMENTE",
+                message_text: "EL CUPON SE ACTUALIZO CORRECTAMENTE",
                 cupone: cuponeT
             });
             
@@ -86,6 +86,24 @@ export default {
             res.status(200).json({
                 message: 200,
                 cupones: cupones
+            });
+            
+        } catch (error) {
+            res.status(500).send({
+                message: "OCURRIO UN ERROR",
+            })
+        }
+    },
+    show: async(req,res) =>{
+        try {
+
+            let cupone_id = req.query.cupone_id
+                
+            let cupon = await models.Cupone.findOne({_id: cupone_id })
+                
+            res.status(200).json({
+                message: 200,
+                cupon: cupon
             });
             
         } catch (error) {
