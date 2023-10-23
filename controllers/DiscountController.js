@@ -11,20 +11,20 @@ export default {
             var filter_b = [];
             if(data.type_segment == 1){
                 filter_a.push({
-                    "products": {$elemMath: {_id: {$in: data.product_s}}}
+                    "products": {$elemMatch: {_id: {$in: data.product_s}}}
                 });
 
                 filter_b.push({
-                    "products": {$elemMath: {_id: {$in: data.product_s}}}
+                    "products": {$elemMatch: {_id: {$in: data.product_s}}}
                 });
            
             }else{
                 filter_a.push({
-                    "categories": {$elemMath: {_id: {$in: data.categorie_s}}}
+                    "categories": {$elemMatch: {_id: {$in: data.categorie_s}}}
                 });
 
                 filter_b.push({
-                    "categories": {$elemMath: {_id: {$in: data.categorie_s}}}
+                    "categories": {$elemMatch: {_id: {$in: data.categorie_s}}}
                 });
             }
 
@@ -32,11 +32,13 @@ export default {
             // esto es porque se pasa a números las fechas para operar mejor las validaciones
             // a es para fecha de inicio
             filter_a.push({
+                type_campaign:data.type_campaign,
                 start_date_num: {$gte: data.start_date_num, $lte: data.end_date_num}
             })
 
             // b es para fecha de fin
             filter_b.push({
+                type_campaign:data.type_campaign,
                 start_date_num: {$gte: data.start_date_num, $lte: data.end_date_num}
             })
 
@@ -45,7 +47,7 @@ export default {
             let exist_end_date = await models.Discount.find({$and: filter_b})
             
             // si una de las fechas está comprometida sale este error
-            if(exist_start_date || exist_end_date ){
+            if(exist_start_date.length > 0 || exist_end_date.length > 0){
                 res.status(200).json({
                     message: 403,
                     message_text: "EL DESCUENTO NO SE PUEDE PROGRAMAR, ELIMINAR ALGUNA OPCION"
@@ -76,20 +78,20 @@ export default {
             var filter_b = [];
             if(data.type_segment == 1){
                 filter_a.push({
-                    "products": {$elemMath: {_id: {$in: data.product_s}}}
+                    "products": {$elemMatch: {_id: {$in: data.product_s}}}
                 });
 
                 filter_b.push({
-                    "products": {$elemMath: {_id: {$in: data.product_s}}}
+                    "products": {$elemMatch: {_id: {$in: data.product_s}}}
                 });
            
             }else{
                 filter_a.push({
-                    "categories": {$elemMath: {_id: {$in: data.categorie_s}}}
+                    "categories": {$elemMatch: {_id: {$in: data.categorie_s}}}
                 });
 
                 filter_b.push({
-                    "categories": {$elemMath: {_id: {$in: data.categorie_s}}}
+                    "categories": {$elemMatch: {_id: {$in: data.categorie_s}}}
                 });
             }
 
@@ -97,12 +99,14 @@ export default {
             // esto es porque se pasa a números las fechas para operar mejor las validaciones
             // a es para fecha de inicio - ne es para que sea diferente el id a guardar
             filter_a.push({
+                type_campaign:data.type_campaign,
                 _id: {$ne: data._id},
                 start_date_num: {$gte: data.start_date_num, $lte: data.end_date_num}
             })
 
             // b es para fecha de fin - ne es para que sea diferente ese id
             filter_b.push({
+                type_campaign:data.type_campaign,
                 _id: {$ne: data._id},
                 start_date_num: {$gte: data.start_date_num, $lte: data.end_date_num}
             })
@@ -112,7 +116,7 @@ export default {
             let exist_end_date = await models.Discount.find({$and: filter_b})
             
             // si una de las fechas está comprometida sale este error
-            if(exist_start_date || exist_end_date ){
+            if(exist_start_date.length > 0 || exist_end_date.length > 0){
                 res.status(200).json({
                     message: 403,
                     message_text: "EL DESCUENTO NO SE PUEDE PROGRAMAR, ELIMINAR ALGUNA OPCION"
@@ -154,7 +158,7 @@ export default {
 
             //let search = req.query.search
                 
-            let discounts = await models.Cupone.find().sort({'createdAt': -1});
+            let discounts = await models.Discount.find().sort({'createdAt': -1});
 
             res.status(200).json({
                 message: 200,
@@ -170,7 +174,7 @@ export default {
     show: async(req,res) =>{
         try {
 
-            let discount_id = req.query.cupone_id
+            let discount_id = req.query.discount_id
                 
             let discount = await models.Discount.findOne({_id: discount_id })
                 

@@ -5,8 +5,8 @@ export default {
             title:slider.title,
             link:slider.link,
             imagen:slider.imagen,
-            state:slider.state
-            
+            imagen_home:'http://localhost:3000'+'/api/slider/uploads/slider/'+slider.imagen,
+            state:slider.state,
         }
     }
 }
