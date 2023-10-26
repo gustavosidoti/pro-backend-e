@@ -34,6 +34,8 @@ export default {
             await models.Category.findByIdAndUpdate({_id: req.body._id},req.body);
 
             let CategorieT = await models.Category.findOne({_id: req.body._id});
+
+            
             res.status(200).json({
                 message: "LA CATEGORIA SE HA MODIFICADO CORRECTAMENTE",
                 categorie: resource.Categorie.category_list(CategorieT),
