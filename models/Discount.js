@@ -10,9 +10,9 @@ const DiscountSchema = Schema({
     start_date_num: {type: Number, required:true},
     end_date_num: {type: Number, required:true},
     state: {type: Number, default:1},
-    type_segment: {type: Number, default: 1}, // 1 es por producto y 2 es por categoria
-    products: {type: Object, required:true},
-    categories: {type: Object, required:true},
+    type_segment: {type: Number, default:1}, // 1 es por producto y 2 es por categoria
+    products: {type: Object, required:false},
+    categories: {type: Object, required:false},
 },
 {
     timestamps:true

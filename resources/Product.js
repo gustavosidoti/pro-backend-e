@@ -1,12 +1,6 @@
 export default {
     product_list: (product, variedades = []) => {
-       /* var IMAGEN_TWO = "";
-        let GALERIAS = product.galerias.map((galeria) => {
-            galeria.imagen = 'http://localhost:3000'+'/api/products/uploads/products/'+galeria.imagen;//*
-            return galeria;
-        });
-        var VAL = Math.floor(Math.random() * 2);
-        IMAGEN_TWO = GALERIAS[0].imagen;*/
+       
         var IMAGEN_TWO = "";
         let GALERIAS = [];
         if(product.galerias && product.galerias.length > 0){//NUEVO POR CAMBIAR

@@ -4,6 +4,9 @@ import resource from '../resources';
 export default {
     list: async(req,res) => {
         try {
+
+            var TIME_NOW  = req.query.TIME_NOW;
+
             let Sliders = await models.Slider.find({state:1});
 
             Sliders = Sliders.map((slider) => {
@@ -17,23 +20,48 @@ export default {
             })
 
             // carga los más vendidos
-            let BestProduct = await models.Product.find({state: 2}).sort({"createdAt": -1});
-            BestProduct = BestProduct.map((product) => {
-                return resource.Product.product_list(product);
-            })
+            let BestProducts = await models.Product.find({state: 2}).sort({"createdAt": -1});
+            var ObjectBestProducts = [];
+            for (const Product of BestProducts) {
+                let VARIEDADES = await models.Variedad.find({product: Product._id});
+                ObjectBestProducts.push(resource.Product.product_list(Product,VARIEDADES));
+            }
 
-            // productos temporales
             let OursProducts = await models.Product.find({state: 2}).sort({"createdAt": 1});
-            OursProducts = OursProducts.map((product) => {
-                return resource.Product.product_list(product);
-            })
 
-            // enviamos al cliente todas las respuestas de la BD juntas
+            var ObjectOursProducts = [];
+            for (const Product of OursProducts) {
+                let VARIEDADES = await models.Variedad.find({product: Product._id});
+                ObjectOursProducts.push(resource.Product.product_list(Product,VARIEDADES));
+            }
+            // OursProducts = OursProducts.map(async (product) => {
+            //     let VARIEDADES = await models.Variedad.find({product: product._id});
+            //     return resource.Product.product_list(product,VARIEDADES);
+            // })
+
+            let FlashSale = await models.Discount.findOne({
+                type_campaign: 2,
+                start_date_num: {$lte: TIME_NOW},// start_date_num >= TIME_NOW
+                end_date_num: {$gte: TIME_NOW},// <=
+            });
+
+            let ProductList = [];
+            if(FlashSale){ // validamos por si no hay campaña, devuelve null, lo salteamos
+
+                for (const product of FlashSale.products) {
+                    var ObjecT = await models.Product.findById({_id: product._id});
+                    let VARIEDADES = await models.Variedad.find({product: product._id});
+                    ProductList.push(resource.Product.product_list(ObjecT,VARIEDADES));
+                }
+            }
+            console.log(FlashSale);
             res.status(200).json({
                 sliders: Sliders,
                 categories: Categories,
-                best_products: BestProduct,
-                our_products: OursProducts
+                best_products: ObjectBestProducts,
+                our_products: ObjectOursProducts,
+                FlashSale: FlashSale,
+                campaign_products: ProductList,
             });
 
         } catch (error) {
