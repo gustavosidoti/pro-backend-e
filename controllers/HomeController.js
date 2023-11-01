@@ -77,7 +77,7 @@ export default {
 
             let Product = await models.Product.findOne({slug: SLUG});
 
-            let VARIEDADES = await models.Product.find({product: Product._id})
+            let VARIEDADES = await models.Variedad.find({product: Product._id})
             res.status(200).json({
                 product: resource.Product.product_list(Product,VARIEDADES),
             })
