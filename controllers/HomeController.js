@@ -75,12 +75,25 @@ export default {
         try {
             let SLUG = req.params.slug;
 
-            let Product = await models.Product.findOne({slug: SLUG});
+            let Product = await models.Product.findOne({slug: SLUG, state: 2});
 
             let VARIEDADES = await models.Variedad.find({product: Product._id})
+            
+
+            // productos relacionados
+            let relatedProducts = await models.Product.find({categorie: Product.categorie, state: 2})
+            var ObjectRelatedProducts = [];
+            for (const Product of relatedProducts) {
+                let VARIEDADES = await models.Variedad.find({product: Product._id});
+                ObjectRelatedProducts.push(resource.Product.product_list(Product,VARIEDADES));
+            }
+
+            // respuesta del servidor
             res.status(200).json({
                 product: resource.Product.product_list(Product,VARIEDADES),
+                related_products: ObjectRelatedProducts,
             })
+
         } catch (error) {
             res.status(500).send({
                 message: "OCURRIO UN ERROR"
