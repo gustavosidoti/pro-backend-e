@@ -67,7 +67,7 @@ export default {
             //2- VALIDAMOS SI EL STOCK ESTÁ DISPONIBLE
             if(data.variedad){
                 let valid_variedad = await models.Variedad.findOne({
-                    id_: data.variedad, 
+                    _id: data.variedad, 
                 })
                 if(valid_variedad.stock < data.cantidad){
                     res.status(200).json({
