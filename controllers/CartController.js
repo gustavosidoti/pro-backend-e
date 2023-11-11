@@ -5,7 +5,7 @@ export default {
     list:async(req,res) => {
         try {
             let user_id = req.query.user_id;
-            let CARS = await models.Cart.find({
+            let CARTS = await models.Cart.find({
                 user: user_id,
             }).populate("variedad").populate({ // populate anidado porque el modelo productos posee anidada las categorias
                 path: "product",
@@ -79,9 +79,8 @@ export default {
 
             }else{
                 // el producto sin variedad . solo unitario
-                let valid_product = await models.Producto.findOne({
-                    
-                    id_: data.product,
+                let valid_product = await models.Product.findOne({
+                    _id: data.product,
                 });
                 if(valid_product.stock < data.cantidad){
                     res.status(200).json({
@@ -94,8 +93,17 @@ export default {
 
             // 3 SE REGISTRA EL CARRITO DE COMPRA
             let CART = await models.Cart.create(data);
+
+            let NEW_CART = await models.Cart.findById({_id: CART._id}).populate("variedad").populate({ // populate anidado porque el modelo productos posee anidada las categorias
+                path: "product",
+                populate: {
+                    path: "categorie"
+                },
+            });
+
+
             res.status(200).json({
-                cart: CART,
+                cart: resource.Cart.cart_list(NEW_CART),
                 message_text: "EL PRODUCTO SE AGREGO AL CARRITO"
             })
             
@@ -114,7 +122,7 @@ export default {
             //1- VALIDAMOS SI EL STOCK ESTÁ DISPONIBLE
             if(data.variedad){
                 let valid_variedad = await models.Variedad.findOne({
-                    id_: data.variedad, 
+                    _id: data.variedad, 
                 })
                 if(valid_variedad.stock < data.cantidad){
                     res.status(200).json({
@@ -126,9 +134,9 @@ export default {
 
             }else{
                 // el producto sin variedad . solo unitario
-                let valid_product = await models.Producto.findOne({
+                let valid_product = await models.Product.findOne({
                     
-                    id_: data.product,
+                    _id: data.product,
                 });
                 if(valid_product.stock < data.cantidad){
                     res.status(200).json({
@@ -141,8 +149,17 @@ export default {
 
             // 2 SE ACTUALIZA EL CARRITO DE COMPRA
             let CART = await models.Cart.findByIdAndUpdate({_id: data._id}, data);
+
+
+            let NEW_CART = await models.Cart.findById({_id: CART._id}).populate("variedad").populate({ // populate anidado porque el modelo productos posee anidada las categorias
+                path: "product",
+                populate: {
+                    path: "categorie"
+                },
+            });
+
             res.status(200).json({
-                cart: CART,
+                cart: resource.Cart.cart_list(NEW_CART),
                 message_text: "EL CARRITO SE ACTUALIZO CORRECTAMENTE"
             })
         } catch (error) {

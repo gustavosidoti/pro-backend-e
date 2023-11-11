@@ -2,6 +2,7 @@ export default {
     cart_list: (cart) => {
         
         return {
+            _id: cart._id,
             user: cart.user,
             product: {
                 _id: cart.product._id,
@@ -18,7 +19,7 @@ export default {
             cantidad: cart.cantidad,
             variedad: cart.variedad,
             code_cupon: cart.code_cupon,
-            code_discount: cart.code_disco,unt,
+            code_discount: cart.code_discount,
             price_unitario: cart.price_unitario,
             subtotal: cart.subtotal,
             total: cart.total,
