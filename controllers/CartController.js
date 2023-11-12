@@ -184,4 +184,106 @@ export default {
             console.log(error);
         }
     },
+    applyCupon:async(req,res) => {
+        try {
+            let data = req.body;
+            // 1- LA PRIMERA VALIDACION TIENE QUE VER CON LA EXISTENCIA DEL CUPON
+           
+            let CUPON = await models.Cupone.findOne({
+                code: data.code,
+            })
+            if(!CUPON){
+                res.status(200).json({
+                    message: 403,
+                    message_text: "EL CUPON INGRESADO NO EXISTE, DIGITE OTRO NUEVAMENTE"
+                })
+                return;
+            }
+
+            // 2- TIENE QUE VER CON EL USO DEL CUPON
+
+            // 3- LA PARTE OPERATIVA
+
+            // 3.1 traemos el carro del usuario
+            let carts = await models.Cart.find({user: data.user_id}).populate("product");
+
+            // 3.2 iteramos los cupones para comprobar si hay productos coincidentes en el carro del usuario
+            let products = [];
+            let categories = [];
+
+            CUPON.products.forEach((product) => {
+                // metemos los id de cada producto que estan en los cupones dentro de un array
+                products.push(product._id);
+            });
+
+            CUPON.categories.forEach((categorie) => {
+                // metemos los id de cada categoria que estan en los cupones dentro de un array
+                categories.push(categorie._id);
+            });
+
+            // iteramos cada elemento del carro
+            for(const cart of carts){
+                // preguntamos si hay coincidencias entre los productos de los cupones y los que tiene el usuario en su carro
+                if(products.length > 0){
+                    if(products.includes(cart.product._id)){
+                        // si hay coincidencias le aplicamos el descuento
+                        let subtotal = 0;
+                        let total = 0;
+
+                        if(CUPON.type_discount == 1){ // descuento por porcentaje
+                            subtotal = cart.price_unitario - cart.price_unitario*(CUPON.discount*0.01);
+                        }else{ // descuento por moneda
+                            subtotal = cart.price_unitario - CUPON.discount;
+                        }
+
+                        total = subtotal * cart.cantidad;
+
+                        // actualizamos el carro con los valores necesarios
+                        await models.Cart.findByIdAndUpdate({_id: cart._id},{
+                            subtotal: subtotal,
+                            total: total,
+                            type_discount: CUPON.type_discount,
+                            discount: CUPON.discount,
+                            code_cupon: CUPON.code,
+                        });
+                    }
+                }
+            
+                if(categories.length > 0){
+                    if(categories.includes(cart.product.categorie)){
+                        // si hay coincidencias le aplicamos el descuento
+                        let subtotal = 0;
+                        let total = 0;
+
+                        if(CUPON.type_discount == 1){ // descuento por porcentaje
+                            subtotal = cart.price_unitario - cart.price_unitario*(CUPON.discount*0.01);
+                        }else{ // descuento por moneda
+                            subtotal = cart.price_unitario - CUPON.discount;
+                        }
+
+                        total = subtotal * cart.cantidad;
+
+                        // actualizamos el carro con los valores necesarios
+                        await models.Cart.findByIdAndUpdate({_id: cart._id},{
+                            subtotal: subtotal,
+                            total: total,
+                            type_discount: CUPON.type_discount,
+                            discount: CUPON.discount,
+                            code_cupon: CUPON.code,
+                        });
+                    }
+                }
+            }
+            // REALIZAMOS LA RESPUESTA
+            res.status(200).json({
+                message: 200,
+                message_text: "EL CUPON SE HA APLICADO CORRECTAMENTE"
+            });
+        } catch (error) {
+            res.status(500).send({
+                message: "OCURRIO UN ERROR",
+            });
+            console.log(error);
+        }
+    }
 }
