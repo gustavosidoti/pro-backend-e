@@ -225,7 +225,7 @@ export default {
             for(const cart of carts){
                 // preguntamos si hay coincidencias entre los productos de los cupones y los que tiene el usuario en su carro
                 if(products.length > 0){
-                    if(products.includes(cart.product._id)){
+                    if(products.includes(cart.product._id+"")){
                         // si hay coincidencias le aplicamos el descuento
                         let subtotal = 0;
                         let total = 0;
@@ -250,7 +250,7 @@ export default {
                 }
             
                 if(categories.length > 0){
-                    if(categories.includes(cart.product.categorie)){
+                    if(categories.includes(cart.product.categorie+"")){
                         // si hay coincidencias le aplicamos el descuento
                         let subtotal = 0;
                         let total = 0;
