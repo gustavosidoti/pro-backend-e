@@ -7,6 +7,7 @@ import Cupone from './Cupone';
 import Discount from './Discount';
 import Home from './Home';
 import Cart from './Cart';
+import AddressClient from "./AddressClient";
 
 const router = routerx();
 router.use('/users',User);
@@ -18,6 +19,7 @@ router.use('/discount',Discount);
 // E-commerce
 router.use('/home',Home);
 router.use('/cart',Cart);
+router.use('/address_client',AddressClient);
 
 
 export default router;

@@ -6,6 +6,7 @@ import Slider from './Slider';
 import Cupone from './Cupone';
 import Discount from './Discount';
 import Cart from './Cart';
+import AddressClient from './AddressClient';
 
 export default {
     User,
@@ -15,6 +16,7 @@ export default {
     Slider,
     Cupone,
     Discount,
-    Cart
+    Cart,
+    AddressClient
 
 }
