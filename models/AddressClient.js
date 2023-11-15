@@ -6,7 +6,7 @@ const AddressClientSchema = new Schema({
     surname: {type: String, maxlength:250, required:true},
     pais: {type: String, maxlength:250, required:true},
     address: {type: String, maxlength:250, required:true},
-    ref: {type: String, maxlength:250, required:false},
+    referencia: {type: String, maxlength:250, required:false},
     ciudad: {type: String, maxlength:250, required:true},
     region: {type: String, maxlength:250, required:true},
     telefono: {type: String, maxlength:250, required:true},
