@@ -140,7 +140,7 @@ export default {
                 var img_path = req.files.avatar.path;
                 var name = img_path.split('\\');
                 var avatar_name = name[2];
-                console.log(avatar_name)
+                
             }
             // validamos la contraseña
             if(req.body.password){

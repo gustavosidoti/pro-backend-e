@@ -17,7 +17,10 @@ export default {
     },
     update:async(req,res) => {
         try {
-            let address_client = await models.AddressClient.findOne({_id: req.body._id});
+            let data = req.body; 
+            await models.AddressClient.findByIdAndUpdate({_id: req.body._id},data);
+
+            let address_client = await models.AddressClient.findById({_id: req.body._id})
 
             
             res.status(200).json({
@@ -33,11 +36,10 @@ export default {
     },
     list:async(req,res) => {
         try {
-            
-            let address_client = await models.AddressClient.find({user: req.query.user_id}).sort({'createdAt': -1});
+            let ADDRESS_CLIENT = await models.AddressClient.find({client: req.query.user_id}).sort({'createdAt': -1});
 
             res.status(200).json({
-                address_client: address_client
+                address_client: ADDRESS_CLIENT
             });
         } catch (error) {
             console.log(error);
