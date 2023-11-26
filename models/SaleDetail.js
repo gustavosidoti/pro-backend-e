@@ -17,6 +17,6 @@ const SaleDetailSchema = new Schema({
     timestamps:true,
 });
 
-const SaleDetail = mongoose.model("sale",SaleDetailSchema);
+const SaleDetail = mongoose.model("sale_detail",SaleDetailSchema);
 
 export default SaleDetail;

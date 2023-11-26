@@ -1,7 +1,7 @@
 import mongoose, {Schema} from "mongoose";
 
 const SaleAddressSchema = new Schema({
-    client: {type: Schema.ObjectId, ref:'user', required:true},
+    user: {type: Schema.ObjectId, ref:'user', required:true},
     name: {type: String, maxlength:250, required:true},
     surname: {type: String, maxlength:250, required:true},
     pais: {type: String, maxlength:250, required:true},
