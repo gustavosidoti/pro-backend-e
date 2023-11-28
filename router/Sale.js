@@ -4,9 +4,11 @@ import auth from '../middlewares/auth'
 
 
 const router = routerx();
-// http://localhost:3000/api/address_client/register
+// http://localhost:3000/api/sale/
 
 router.post("/register",auth.verifyEcommerce,SaleController.register);
+
+router.get("/send_email/:id",SaleController.send_email);
 
 
 

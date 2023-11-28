@@ -70,48 +70,71 @@ export default {
     },
 
     send_email: async(req,res) => {
-        var readHTMLFile = function(path, callback) {
-            fs.readFile(path, {encoding: 'utf-8'}, function (err, html) {
-                if (err) {
-                    throw err;
-                    callback(err);
-                }
-                else {
-                    callback(null, html);
-                }
-            });
-        };
-
-        var transporter = nodemailer.createTransport(smtpTransport({
-            service: 'gmail',
-            host: 'smtp.gmail.com',
-            auth: {
-            user: 'gustavosidoti@gmail.com',
-            pass: 'tpxmkzakjuuduhxo'
-            }
-        }));
-
-        readHTMLFile(process.cwd() + '/mails/email_sale.html', (err, html)=>{
-                                
-            let rest_html = ejs.render(html, {});
-    
-            var template = handlebars.compile(rest_html);
-            var htmlToSend = template({op:true});
-    
-            var mailOptions = {
-                from: 'gustavosidoti@gmail.com',
-                to: email_cliente,
-                subject: 'Finaliza tu compra ' + orden._id,
-                html: htmlToSend
+        try {
+            var readHTMLFile = function(path, callback) {
+                fs.readFile(path, {encoding: 'utf-8'}, function (err, html) {
+                    if (err) {
+                        throw err;
+                        callback(err);
+                    }
+                    else {
+                        callback(null, html);
+                    }
+                });
             };
-          
-            transporter.sendMail(mailOptions, function(error, info){
-                if (!error) {
-                    console.log('Email sent: ' + info.response);
+
+            // ACA OBTENEMOS LOS DATOS DEL CLIENTE PARA ENVIARLE EL CORREO
+            let Order = await models.Sale.findById({_id: req.params.id}).populate("user");
+
+            let OrderDetail = await models.SaleDetail.find({sale: Order._id}).populate("product").populate("variedad");
+
+            let AddressSale = await models.SaleAddress.findOne({sale: Order._id});
+    
+            var transporter = nodemailer.createTransport(smtpTransport({
+                service: 'gmail',
+                host: 'smtp.gmail.com',
+                auth: {
+                user: 'gustavosidoti@gmail.com',
+                pass: 'tpxmkzakjuuduhxo'
                 }
-            });
+            }));
+    
+            readHTMLFile(process.cwd() + '/mails/email_sale.html', (err, html)=>{
+                
+                // ACA LE PASAMOS LOS OBJETOS CARGADOS AL DOM de la plantilla de correo para armar el email
+
+                let rest_html = ejs.render(html, {order: Order, address_sale: AddressSale, order_detail: OrderDetail});
         
-        });
+                var template = handlebars.compile(rest_html);
+                var htmlToSend = template({op:true});
+        
+                var mailOptions = {
+                    from: 'gustavosidoti@gmail.com',
+                    to: Order.user.email,
+                    subject: 'Finaliza tu compra ' + Order._id,
+                    html: htmlToSend
+                };
+              
+                transporter.sendMail(mailOptions, function(error, info){
+                    if (!error) {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
+            
+            });
+
+            res.status(200).json({
+                message: "EL CORREO SE ENVIO CORRECTAMENTE",
+
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({
+                message: "OCURRIO UN ERROR"
+            });
+        }
+        
 
 
     }
