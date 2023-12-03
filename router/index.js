@@ -9,6 +9,7 @@ import Home from './Home';
 import Cart from './Cart';
 import AddressClient from "./AddressClient";
 import Sale from "./Sale";
+import Review from "./Review";
 
 const router = routerx();
 router.use('/users',User);
@@ -22,6 +23,7 @@ router.use('/home',Home);
 router.use('/cart',Cart);
 router.use('/address_client',AddressClient);
 router.use('/sale',Sale);
+router.use('/review',Review);
              
 
 export default router;

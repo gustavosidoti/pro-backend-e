@@ -21,7 +21,12 @@ async function send_email(sale_id) {
         };
 
         // ACA OBTENEMOS LOS DATOS DEL CLIENTE PARA ENVIARLE EL CORREO
+
+        console.log("Hasta acá venimos bien");
+
         let Order = await models.Sale.findById({_id: sale_id}).populate("user");
+
+        console.log(Order);
 
         let OrderDetail = await models.SaleDetail.find({sale: Order._id}).populate("product").populate("variedad");
 
@@ -124,13 +129,15 @@ export default {
                     });
                 }
 
-                // ELIMINAMOS EL CARRO
-                await models.Cart.findByIdAndDelete({_id: CART._id})
                 // FINALIZAMOS CON EL GUARDADO DE CADA PRODUCTO EN BD DE DETALLE DE LA VENTA
                 await models.SaleDetail.create(CART)
+                // ELIMINAMOS EL CARRO
+                await models.Cart.findByIdAndDelete({_id: CART._id})
+                
             }
 
             // 4 LLAMAMOS A LA FUNCION QUE ENVIA EL MAIL AL CLIENTE
+                console.log(SALE._id)
                 await send_email(SALE._id);
             // 5 DEVOLVEMOS AL CLIENTE EL MENSAJE DE EXITO
             res.status(200).json({

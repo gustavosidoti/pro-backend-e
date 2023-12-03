@@ -1,5 +1,6 @@
 import models from '../models';
 import resource from '../resources';
+import bcrypt from 'bcryptjs';
 
 export default {
     list: async(req,res) => {
@@ -100,5 +101,118 @@ export default {
             });
             console.log(error);
         }
+    },
+    profile_client:async(req,res) => {
+        try {
+
+            let user_id = req.body.user_id;
+
+            let Orders = await models.Sale.find({user: user_id});
+
+            let sale_orders = [];
+
+            for (const order of Orders) {
+                // obtenemos el detalle de esa orden // hacemos un populate anidado
+                let detail_orders = await models.SaleDetail.find({sale: order._id}).populate({
+                    path: "product",
+                    populate: {
+                        path: "categorie"
+                    },
+                }).populate("variedad");    
+                // obtenemos la direccion de cada compra
+                let sale_address = await models.SaleAddress.find({sale: order._id});
+                // creamos un array de cada item de cada orden vacio
+                let collection_detail_orders = [];
+
+                // iteramos cada item de cada orden
+                for (const detail_order of detail_orders){
+
+                    //review del producto
+                    let reviewS = await model.Review.findOne({sale_detail: detail_order._id});
+                    // llenamos el array de detalle de cada orden con los datos de ese item
+                    collection_detail_orders.push({
+                        _id: detail_order._id,
+                        product: {
+                            _id: detail_order.product._id,
+                            title: detail_order.product.title,
+                            sku: detail_order.product.sku,
+                            slug: detail_order.product.slug,
+                            imagen: 'http://localhost:3000'+'/api/products/uploads/products/'+detail_order.product.portada,//*
+                            categorie: detail_order.product.categorie,
+                            priceEuro: detail_order.product.priceEuro,
+                            priceUSD: detail_order.product.priceUSD,
+                        },
+                        type_discount: detail_order.type_discount,
+                        discount: detail_order.discount,
+                        cantidad: detail_order.cantidad,
+                        variedad: detail_order.variedad,
+                        code_cupon: detail_order.code_cupon,
+                        code_discount: detail_order.code_discount,
+                        price_unitario: detail_order.price_unitario,
+                        subtotal: detail_order.subtotal,
+                        total: detail_order.total,
+                        review: reviewS,
+                    })
+                }
+                // llenamos el array de cada orden
+                sale_orders.push({
+                    sale: order,
+                    sale_details: collection_detail_orders,
+                    sale_address: sale_address,
+                })
+            }
+
+            // traemos también las direcciones del cliente 
+            let ADDRESS_CLIENT = await models.AddressClient.find({user: user_id}).sort({'createdAt': -1});
+
+            res.status(200).json({
+                sale_orders: sale_orders,
+                address_client: ADDRESS_CLIENT,
+            })
+
+        } catch (error) {
+            res.status(500).send({
+                message: "OCURRIO UN ERROR"
+            });
+            console.log(error);
+        }
+    },
+    // SECCION DATOS DEL CLIENTE
+    update_client:async(req,resp) =>{
+        try {
+            // para los campos relacionados con archivos
+            if(req.files){
+                var img_path = req.files.avatar.path;
+                var name = img_path.split('\\');
+                var avatar_name = name[2];
+                
+            }
+            // validamos la contraseña
+            if(req.body.password){
+                req.body.password = await bcrypt.hash(req.body.password, 10);
+            }
+
+            // actualizo en bd
+            await models.User.findByIdAndUpdate({_id: req.body._id}, req.body);
+
+            let User = await models.User.findOne(({_id: req.body._id}));
+
+
+            res.status(200).json({
+                message: "SE GUARDO CORRECTAMENTE",
+                user:{
+                    name:User.name,
+                    surname:User.surname,
+                    email:User.email,
+                    _id:User._id,
+                }
+            });
+        } catch (error) {
+            res.status(500).send({
+                message: "OCURRIO UN ERROR"
+            });
+            console.log(error);
+        }
     }
+
 }
