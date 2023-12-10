@@ -9,7 +9,7 @@ export default {
                 title: cart.product.title,
                 sku: cart.product.sku,
                 slug: cart.product.slug,
-                imagen: 'http://localhost:3000'+'/api/products/uploads/products/'+cart.product.portada,//*
+                imagen: "http://localhost:3000"+'/api/products/uploads/products/'+cart.product.portada,//*
                 categorie: cart.product.categorie,
                 priceEuro: cart.product.priceEuro,
                 priceUSD: cart.product.priceUSD,

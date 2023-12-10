@@ -10,7 +10,7 @@ export default {
             
             let valid_Product = await models.Product.findOne({title: data.title});
             
-            console.log(valid_Product);
+            
             if(valid_Product){
                 res.status(200).json({
                     code: 403,
@@ -27,7 +27,7 @@ export default {
                 data.portada = portada_name;
             }
             
-            console.log(data);
+            
             let product = await models.Product.create(data);
 
             res.status(200).json({

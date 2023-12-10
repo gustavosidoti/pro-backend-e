@@ -25,7 +25,14 @@ export default {
             var ObjectBestProducts = [];
             for (const Product of BestProducts) {
                 let VARIEDADES = await models.Variedad.find({product: Product._id});
-                ObjectBestProducts.push(resource.Product.product_list(Product,VARIEDADES));
+                
+                //traemos el promedio de reviews para un producto
+                let REVIEWS = await models.Variedad.find({product: Product._id});
+                let AVG_REVIEW = REVIEWS.length > 0 ? Math.ceil(REVIEWS.reduce((sum,item) => sum + item.cantidad,0)/REVIEWS.length) : 0;
+                let COUNT_REVIEW = REVIEWS.length;
+
+
+                ObjectBestProducts.push(resource.Product.product_list(Product,VARIEDADES, AVG_REVIEW, COUNT_REVIEW));
             }
 
             let OursProducts = await models.Product.find({state: 2}).sort({"createdAt": 1});
@@ -33,7 +40,11 @@ export default {
             var ObjectOursProducts = [];
             for (const Product of OursProducts) {
                 let VARIEDADES = await models.Variedad.find({product: Product._id});
-                ObjectOursProducts.push(resource.Product.product_list(Product,VARIEDADES));
+                //traemos el promedio de reviews para un producto
+                let REVIEWS = await models.Variedad.find({product: Product._id});
+                let AVG_REVIEW = REVIEWS.length > 0 ? Math.ceil(REVIEWS.reduce((sum,item) => sum + item.cantidad,0)/REVIEWS.length) : 0;
+                let COUNT_REVIEW = REVIEWS.length;
+                ObjectOursProducts.push(resource.Product.product_list(Product,VARIEDADES, AVG_REVIEW,COUNT_REVIEW));
             }
             // OursProducts = OursProducts.map(async (product) => {
             //     let VARIEDADES = await models.Variedad.find({product: product._id});
@@ -55,7 +66,7 @@ export default {
                     ProductList.push(resource.Product.product_list(ObjecT,VARIEDADES));
                 }
             }
-            console.log(FlashSale);
+           
             res.status(200).json({
                 sliders: Sliders,
                 categories: Categories,
@@ -75,6 +86,7 @@ export default {
     show_landing_product: async(req,res) => {
         try {
             let SLUG = req.params.slug;
+            let DISCOUNT_ID = req.query._id;
 
             let Product = await models.Product.findOne({slug: SLUG, state: 2});
 
@@ -89,10 +101,17 @@ export default {
                 ObjectRelatedProducts.push(resource.Product.product_list(Product,VARIEDADES));
             }
 
+            // traer el descuento de ese producto
+            let SALE_FLASH = null;
+            if(DISCOUNT_ID){
+                SALE_FLASH = await models.Discount.findById({_id: DISCOUNT_ID})
+            }
+
             // respuesta del servidor
             res.status(200).json({
                 product: resource.Product.product_list(Product,VARIEDADES),
                 related_products: ObjectRelatedProducts,
+                SALE_FLASH: SALE_FLASH
             })
 
         } catch (error) {
@@ -128,7 +147,7 @@ export default {
                 for (const detail_order of detail_orders){
 
                     //review del producto
-                    let reviewS = await model.Review.findOne({sale_detail: detail_order._id});
+                    let reviewS = await models.Review.findOne({sale_detail: detail_order._id});
                     // llenamos el array de detalle de cada orden con los datos de ese item
                     collection_detail_orders.push({
                         _id: detail_order._id,

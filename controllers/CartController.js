@@ -34,23 +34,21 @@ export default {
     register:async(req,res) => {
         try {
             let data = req.body;
-            //1- VALIDAMOS SI EL PRODUCTO EXISTE EN EL CARRRITO DE COMPRAS
+            //PRIMERO VAMOS A VALIDAR SI EL PRODUCTO EXISTE EN EL CARRITO DE COMPRA
             if(data.variedad){
                 let valid_cart = await models.Cart.findOne({
                     user: data.user,
                     variedad: data.variedad,
                     product: data.product,
-                })
-            
+                });
                 if(valid_cart){
                     res.status(200).json({
                         message: 403,
-                        message_text: "EL PRODUCTO CON LA VARIEDAD YA EXISTE EN EL CARRITO DE COMPRA"
+                        message_text: "EL PRODUCTO CON LA VARIEDAD YA EXISTE EN EL CARRITO DE COMPRA",
                     })
                     return;
                 }
             }else{
-                // el producto sin variedad . solo unitario
                 let valid_cart = await models.Cart.findOne({
                     user: data.user,
                     product: data.product,
@@ -58,17 +56,18 @@ export default {
                 if(valid_cart){
                     res.status(200).json({
                         message: 403,
-                        message_text: "EL PRODUCTO YA EXISTE EN EL CARRITO DE COMPRA"
+                        message_text: "EL PRODUCTO YA EXISTE EN EL CARRITO DE COMPRA",
                     })
                     return;
                 }
             }
-            
-            //2- VALIDAMOS SI EL STOCK ESTÁ DISPONIBLE
+
+            //SEGUNDO VAMOS A VALIDAR SI EL STOCK ESTA DISPONIBLE
+
             if(data.variedad){
                 let valid_variedad = await models.Variedad.findOne({
-                    _id: data.variedad, 
-                })
+                    id_: data.variedad,
+                });
                 if(valid_variedad.stock < data.cantidad){
                     res.status(200).json({
                         message: 403,
@@ -76,9 +75,7 @@ export default {
                     })
                     return;
                 }
-
             }else{
-                // el producto sin variedad . solo unitario
                 let valid_product = await models.Product.findOne({
                     _id: data.product,
                 });
@@ -86,25 +83,21 @@ export default {
                     res.status(200).json({
                         message: 403,
                         message_text: "EL STOCK NO ESTA DISPONIBLE"
-                    })
+                    });
                     return;
                 }
             }
-
-            // 3 SE REGISTRA EL CARRITO DE COMPRA
             let CART = await models.Cart.create(data);
-
-            let NEW_CART = await models.Cart.findById({_id: CART._id}).populate("variedad").populate({ // populate anidado porque el modelo productos posee anidada las categorias
+            
+            let NEW_CART = await models.Cart.findById({_id: CART._id}).populate("variedad").populate({
                 path: "product",
                 populate: {
                     path: "categorie"
                 },
             });
-
-
             res.status(200).json({
                 cart: resource.Cart.cart_list(NEW_CART),
-                message_text: "EL PRODUCTO SE AGREGO AL CARRITO"
+                message_text: "EL CARRITO SE REGISTRO CON EXITO",
             })
             
         } catch (error) {
