@@ -20,6 +20,12 @@ export default {
                 return resource.Categorie.category_list(categorie);
             })
 
+            let CampaingDiscount = await models.Discount.findOne({
+                type_campaign: 1,
+                start_date_num: {$lte: TIME_NOW},// start_date_num >= TIME_NOW
+                end_date_num: {$gte: TIME_NOW},// <=
+            });
+
             // carga los más vendidos
             let BestProducts = await models.Product.find({state: 2}).sort({"createdAt": -1});
             var ObjectBestProducts = [];
@@ -31,8 +37,34 @@ export default {
                 let AVG_REVIEW = REVIEWS.length > 0 ? Math.ceil(REVIEWS.reduce((sum,item) => sum + item.cantidad,0)/REVIEWS.length) : 0;
                 let COUNT_REVIEW = REVIEWS.length;
 
+                // Determinamos si hay campaña de descuentos
 
-                ObjectBestProducts.push(resource.Product.product_list(Product,VARIEDADES, AVG_REVIEW, COUNT_REVIEW));
+                let DISCOUNT_EXIST = null;
+                if(CampaingDiscount){
+                    if(CampaingDiscount.type_segment == 1){ // por producto
+                        let products_a = [];
+                        CampaingDiscount.products.forEach( item => {
+                            products_a.push(item._id);
+                        })
+                       if (CampaingDiscount.products.includes(Product._id+"")){
+                            DISCOUNT_EXIST = CampaingDiscount;
+                       }
+                    }else{ // por categoria
+                        let categories_a = [];
+                        CampaingDiscount.categories.forEach( item => {
+                            categories_a.push(item._id);
+                        })
+
+                        if (CampaingDiscount.categories.includes(Product.categorie+"")){
+                            DISCOUNT_EXIST = CampaingDiscount;
+
+                        }
+
+                    }
+                }
+
+                // armamos el objeto con los paramétros que hemos ido buscando
+                ObjectBestProducts.push(resource.Product.product_list(Product,VARIEDADES, AVG_REVIEW, COUNT_REVIEW, DISCOUNT_EXIST));
             }
 
             let OursProducts = await models.Product.find({state: 2}).sort({"createdAt": 1});
@@ -44,7 +76,34 @@ export default {
                 let REVIEWS = await models.Variedad.find({product: Product._id});
                 let AVG_REVIEW = REVIEWS.length > 0 ? Math.ceil(REVIEWS.reduce((sum,item) => sum + item.cantidad,0)/REVIEWS.length) : 0;
                 let COUNT_REVIEW = REVIEWS.length;
-                ObjectOursProducts.push(resource.Product.product_list(Product,VARIEDADES, AVG_REVIEW,COUNT_REVIEW));
+
+                // Determinamos si hay campaña de descuentos
+
+                let DISCOUNT_EXIST = null;
+                if(CampaingDiscount){
+                    if(CampaingDiscount.type_segment == 1){ // por producto
+                        let products_a = [];
+                        CampaingDiscount.products.forEach( item => {
+                            products_a.push(item._id);
+                        })
+                       if (CampaingDiscount.products.includes(Product._id+"")){
+                            DISCOUNT_EXIST = CampaingDiscount;
+                       }
+                    }else{ // por categoria
+                        let categories_a = [];
+                        CampaingDiscount.categories.forEach( item => {
+                            categories_a.push(item._id);
+                        })
+
+                        if (CampaingDiscount.categories.includes(Product.categorie+"")){
+                            DISCOUNT_EXIST = CampaingDiscount;
+
+                        }
+
+                    }
+                }
+
+                ObjectOursProducts.push(resource.Product.product_list(Product,VARIEDADES, AVG_REVIEW,COUNT_REVIEW, DISCOUNT_EXIST));
             }
             // OursProducts = OursProducts.map(async (product) => {
             //     let VARIEDADES = await models.Variedad.find({product: product._id});
@@ -73,7 +132,7 @@ export default {
                 best_products: ObjectBestProducts,
                 our_products: ObjectOursProducts,
                 FlashSale: FlashSale,
-                campaign_products: ProductList,
+                campaing_products: ProductList,
             });
 
         } catch (error) {
