@@ -150,6 +150,11 @@ export default {
             let Product = await models.Product.findOne({slug: SLUG, state: 2});
 
             let VARIEDADES = await models.Variedad.find({product: Product._id})
+
+            //traemos el promedio de reviews para un producto
+            let REVIEWS = await models.Variedad.find({product: Product._id}).populate("user");
+            let AVG_REVIEW = REVIEWS.length > 0 ? Math.ceil(REVIEWS.reduce((sum,item) => sum + item.cantidad,0)/REVIEWS.length) : 0;
+            let COUNT_REVIEW = REVIEWS.length;
             
 
             // productos relacionados
@@ -170,7 +175,10 @@ export default {
             res.status(200).json({
                 product: resource.Product.product_list(Product,VARIEDADES),
                 related_products: ObjectRelatedProducts,
-                SALE_FLASH: SALE_FLASH
+                SALE_FLASH: SALE_FLASH,
+                REVIEWS: REVIEWS,
+                AVG_REVIEW: AVG_REVIEW,
+                COUNT_REVIEW: COUNT_REVIEW
             })
 
         } catch (error) {
