@@ -5,7 +5,7 @@ const ReviewSchema = new Schema({
     sale_detail: {type: Schema.ObjectId,ref:'sale_detail', required:true},
     user: {type: Schema.ObjectId,ref:'user', required:true},
     cantidad: {type: Number, maxlength:2, required:true},
-    description: {type: String, maxlength:2, required:true},
+    description: {type: String, required:true},
     
 },
 {

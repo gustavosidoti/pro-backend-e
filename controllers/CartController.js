@@ -99,10 +99,9 @@ export default {
                 cart: resource.Cart.cart_list(NEW_CART),
                 message_text: "EL CARRITO SE REGISTRO CON EXITO",
             })
-            
         } catch (error) {
             res.status(500).send({
-                message: "OCURRIO UN ERROR",
+                message:"OCURRIO UN ERROR",
             });
             console.log(error);
         }

@@ -1,17 +1,18 @@
 import models from "../models";
 
 export default {
-    register: async(req,res) => {
+    register:async(req,res) => {
         try {
             let review = await models.Review.create(req.body);
 
             res.status(200).json({
                 message: "LA RESEÑA HA SIDO REGISTRADA CORRECTAMENTE",
-                review: review
-            })
+                review: review,
+            });
         } catch (error) {
+            console.log(error);
             res.status(500).send({
-                message: "COURRIO UN PROBLEMA"
+                message:"OCURRIO UN ERROR",
             });
         }
     },

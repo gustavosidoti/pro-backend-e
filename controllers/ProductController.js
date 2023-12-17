@@ -9,8 +9,7 @@ export default {
             let data = req.body;
             
             let valid_Product = await models.Product.findOne({title: data.title});
-            
-            
+
             if(valid_Product){
                 res.status(200).json({
                     code: 403,
@@ -18,7 +17,7 @@ export default {
                 });
                 return;
             }
-            
+
             data.slug = data.title.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
             if(req.files){
                 var img_path = req.files.imagen.path;
@@ -26,8 +25,7 @@ export default {
                 var portada_name = name[2];
                 data.portada = portada_name;
             }
-            
-            
+
             let product = await models.Product.create(data);
 
             res.status(200).json({
@@ -76,26 +74,24 @@ export default {
     },
     list:async(req,res) => {
         try {
-           var filter = [];
-           if (req.query.search && req.query.search.trim() !== '') { 
-            filter.push({ title: new RegExp(req.query.search, "i") });
-           }
-           if (req.query.categorie && req.query.categorie.trim() !== '') { 
-              filter.push({ categorie: req.query.categorie });
-          }
-           
-           
-          let products = []; 
-          if (filter.length > 0) { 
-          products = await models.Product.find({ $and: filter }).populate("categorie"); 
-          } else { 
-           products = await models.Product.find().populate("categorie"); 
-          }
+            var filter = [];
+            if(req.query.search){
+                filter.push(
+                    {"title": new RegExp(req.query.search,'i')},
+                );
+            }
+            if(req.query.categorie){
+                filter.push(
+                    {"categorie": req.query.categorie}
+                );
+            }
+            let products = await models.Product.find({
+                $and:filter,
+            }).populate('categorie')
             products = products.map(product => {
                 return resources.Product.product_list(product);
             })
-            
-            //let products = await models.Product.find().populate('categorie')
+
             res.status(200).json({
                 products: products,
             })
@@ -145,7 +141,6 @@ export default {
             let PRODUCT = await models.Product.findById({_id: product_id}).populate("categorie");
 
             let VARIEDADES = await models.Variedad.find({product: product_id});
-           
             res.status(200).json({
                 product: resources.Product.product_list(PRODUCT,VARIEDADES),
             })
@@ -156,9 +151,6 @@ export default {
             console.log(error);
         }
     },
-
-   
-
     register_imagen:async(req,res) => {
         try {
             var img_path = req.files.imagen.path;
@@ -176,7 +168,7 @@ export default {
             res.status(200).json({
                 message: "LA IMAGEN SE SUBIO PERFECTAMENTE",
                 imagen: {
-                    imagen: 'http://localhost:3000'+'/api/products/uploads/products/'+imagen_name,
+                    imagen: process.env.URL_BACKEND+'/api/products/uploads/products/'+imagen_name,
                     _id: req.body.__id
                 }
             })
