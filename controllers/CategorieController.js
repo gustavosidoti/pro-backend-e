@@ -31,9 +31,9 @@ export default {
                 // console.log(portada_name)
                 req.body.imagen = portada_name;
             }
-            await models.Category.findByIdAndUpdate({_id: req.body._id},req.body);
+            await models.Categorie.findByIdAndUpdate({_id: req.body._id},req.body);
 
-            let CategorieT = await models.Category.findOne({_id: req.body._id});
+            let CategorieT = await models.Categorie.findOne({_id: req.body._id});
 
             
             res.status(200).json({
